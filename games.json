@@ -1,0 +1,29 @@
+{
+    "games": [
+        {
+            "name": "Soh",
+            "repo": "HarbourMasters/Shipwright",
+            "gamebanana_id": 16121
+        },
+        {
+            "name": "2Ship",
+            "repo": "HarbourMasters/2ship2harkinian",
+            "gamebanana_id": 20371
+        },
+        {
+            "name": "Starship",
+            "repo": "HarbourMasters/starship",
+            "gamebanana_id": 21612
+        },
+        {
+            "name": "SpaghettiKart",
+            "repo": "HarbourMasters/SpaghettiKart",
+            "gamebanana_id": 22970
+        },
+        {
+            "name": "Ghostship",
+            "repo": "HarbourMasters/Ghostship",
+            "gamebanana_id": 24131
+        }
+    ]
+}
