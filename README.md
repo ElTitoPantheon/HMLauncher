@@ -1,1 +1,1 @@
-![HM Launcher](docs/launcher-preview.png)
+![HMLauncher](docs/launcher-preview.png)
