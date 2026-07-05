@@ -199,7 +199,7 @@ class ZipSelectionDialog(QDialog):
             }
 
             QPushButton:hover {
-                background:#c83c3c;
+                background:#707070;
             }
 
             QTreeWidget {
@@ -2865,7 +2865,7 @@ class HM64Launcher(QMainWindow):
 
           toggle_btn = QPushButton()
 
-          toggle_btn.setFixedSize(37, 36)
+          toggle_btn.setFixedSize(36, 36)
 
           if activo:
 
@@ -2891,7 +2891,7 @@ class HM64Launcher(QMainWindow):
 
               toggle_btn.setStyleSheet("""
                   QPushButton {
-                      background:#5a5a5a;
+                      background:#3a3a3a;
                       color:white;
                       border:none;
                       border-radius:10px;
@@ -2909,6 +2909,30 @@ class HM64Launcher(QMainWindow):
           )
 
           layout.addWidget(toggle_btn)
+
+          delete_btn = QPushButton("🗑")
+          delete_btn.setFixedSize(36, 36)
+
+          delete_btn.setStyleSheet("""
+              QPushButton {
+                  background:#3a3a3a;
+                  color:white;
+                  border:none;
+                  border-radius:10px;
+                  font-size:14px;
+              }
+
+              QPushButton:hover {
+                  background:#c83c3c;
+              }
+          """)
+
+          delete_btn.clicked.connect(
+              lambda _, n=mod_name:
+              self.delete_mod(mods_path, n)
+          )
+
+          layout.addWidget(delete_btn)
 
           return card
 
@@ -3037,6 +3061,64 @@ class HM64Launcher(QMainWindow):
          self.mods_layout.addStretch()
 
 
+
+
+    def delete_mod(self, mods_path, mod_name):
+
+        msgbox = QMessageBox(self)
+        msgbox.setWindowFlag(Qt.FramelessWindowHint)
+
+        msgbox.setText(
+            f"¿Seguro que quieres borrar este mod?\n\n{mod_name}"
+        )
+
+        msgbox.setStandardButtons(
+            QMessageBox.Yes | QMessageBox.No
+        )
+
+        msgbox.setDefaultButton(QMessageBox.No)
+
+        msgbox.setStyleSheet("""
+            QMessageBox {
+                background:#232323;
+                border-radius:14px;
+                border:1px solid #000000;
+            }
+
+            QLabel {
+                color:white;
+                font-size:12px;
+                font-weight:bold;
+            }
+
+            QPushButton {
+                background:#3a3a3a;
+                color:white;
+                border:none;
+                border-radius:8px;
+                padding:8px 14px;
+                min-width:70px;
+            }
+
+            QPushButton:hover {
+                background:#c83c3c;
+            }
+        """)
+
+        if msgbox.exec() != QMessageBox.Yes:
+            return
+
+        try:
+            os.remove(os.path.join(mods_path, mod_name))
+            self.load_mods()
+
+        except Exception as e:
+            QMessageBox.warning(
+                self,
+                "Error",
+                f"No se pudo borrar el mod:\n\n{e}"
+            )
+    
     #------------------------------
     # Gamebanana page details logic
     #------------------------------
