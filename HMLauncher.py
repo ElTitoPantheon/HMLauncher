@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (
     QWidget, QListWidget, QTreeWidgetItem, QListWidgetItem,
     QTreeWidget, QStackedWidget,
     QFrame, QProgressBar,QLineEdit, QScrollArea, QGridLayout,
-    QDialog, QTextEdit, QFileDialog, QMessageBox, QSpinBox
+    QDialog, QTextEdit, QFileDialog, QMessageBox, QSpinBox, QDialogButtonBox
 )
 from PySide6.QtCore import Qt, QThread, Signal, QTimer, QObject
 from PySide6.QtGui import QMouseEvent, QPixmap, QImage, QColor
@@ -67,6 +67,11 @@ TABS = ["General", "Versiones", "Mods", "GameBanana"]
 
 BASE_URL = "https://gamebanana.com/apiv11/Game/{}/Subfeed"
 
+
+
+# -------------------------
+# Releases Thread
+# -------------------------
 class ReleasesLoader(QThread):
 
     finished_loading = Signal(dict)
@@ -92,7 +97,9 @@ class ReleasesLoader(QThread):
 
         self.finished_loading.emit(cache)
 
-
+# -------------------------
+# Mods Download Threat
+# -------------------------
 class ModFileDownloadThread(QThread):
 
     progress = Signal(int)
@@ -147,43 +154,6 @@ class ModFileDownloadThread(QThread):
             # -------------------------
             # EXTRAER ZIP
             # -------------------------
-
-            if self.destination.lower().endswith(".zip"):
-
-                self.status.emit("Extrayendo...")
-
-                with zipfile.ZipFile(
-                    self.destination,
-                    "r"
-                ) as z:
-
-                    total_files = len(
-                        z.infolist()
-                    )
-
-                    for i, member in enumerate(
-                        z.infolist()
-                    ):
-
-                        z.extract(
-                            member,
-                            os.path.dirname(
-                                self.destination
-                            )
-                        )
-
-                        percent = int(
-                            ((i + 1) / total_files) * 100
-                        )
-
-                        self.progress.emit(
-                            percent
-                        )
-
-                os.remove(
-                    self.destination
-                )
-
             self.finished.emit(
                 self.destination
             )
@@ -193,12 +163,145 @@ class ModFileDownloadThread(QThread):
             self.status.emit(
                 f"Error: {e}"
             )
+
+# -------------------------
+# Mods Select Dialog
+# -------------------------
+class ZipSelectionDialog(QDialog):
+
+    def __init__(self, zip_file, parent=None):
+        super().__init__(parent)
+
+        self.setWindowFlags(
+            Qt.Dialog | Qt.FramelessWindowHint
+        )
+
+        self.setStyleSheet("""
+            QDialog {
+                background:#232323;
+                border-radius:14px;
+                border:1px solid #000000;
+            }
+
+            QLabel {
+                color:white;
+                font-size:12px;
+                font-weight:bold;
+            }
+
+            QPushButton {
+                background:#3a3a3a;
+                color:white;
+                border:none;
+                border-radius:8px;
+                padding:8px 14px;
+                min-width:80px;
+            }
+
+            QPushButton:hover {
+                background:#c83c3c;
+            }
+
+            QTreeWidget {
+                background:#1e1e1e;
+                color:white;
+                border:1px solid #000;
+            }
+
+            QScrollBar:vertical {
+                background:#1e1e1e;
+                width:10px;
+                margin:0px;
+            }
+
+            QScrollBar::handle:vertical {
+                background:#3a3a3a;
+                border-radius:5px;
+                min-height:20px;
+            }
+
+            QScrollBar::handle:vertical:hover {
+                background:#C83C3C;
+            }
+
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {
+                height:0px;
+            }
+
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {
+                background:none;
+            }
+        """)
+
+        self.resize(390,320)
         
+        layout = QVBoxLayout(self)
+
+        title = QLabel("Selecciona los archivos que deseas instalar")
+        layout.addWidget(title)
+
+        self.tree = QTreeWidget()
+
+        self.tree.setHeaderHidden(True)
+
+        layout.addWidget(self.tree)
+
+        with zipfile.ZipFile(zip_file,"r") as z:
+
+            for info in z.infolist():
+
+                if info.is_dir():
+                    continue
+
+                item = QTreeWidgetItem([info.filename])
+
+                item.setCheckState(
+                    0,
+                    Qt.Checked
+                )
+
+                self.tree.addTopLevelItem(item)
+
+        buttons = QDialogButtonBox()
+
+        install_btn = QPushButton("💾")
+
+        buttons.addButton(
+            install_btn,
+            QDialogButtonBox.AcceptRole
+        )
+
+        install_btn.clicked.connect(self.accept)
+
+        layout.addWidget(buttons)
+
+
+    def selected_files(self):
+
+        files=[]
+
+        for i in range(self.tree.topLevelItemCount()):
+
+            item=self.tree.topLevelItem(i)
+
+            if item.checkState(0)==Qt.Checked:
+
+                files.append(item.text(0))
+
+        return files
+    
+# -------------------------
+# 
+# -------------------------        
 class Bridge(QObject):
      mods_ready = Signal(int, list)
      image_ready = Signal(str, bytes, object)
 
-
+# -------------------------
+# 
+# -------------------------
 class FetchThread(threading.Thread):
     def __init__(self, gid, bridge):
         super().__init__(daemon=True)
@@ -254,7 +357,7 @@ class FetchThread(threading.Thread):
         self.bridge.mods_ready.emit(self.fetch_id, mods)
 
 # -------------------------
-# THREAD DESCARGA
+# Releases Download Threat
 # -------------------------
 class DownloadThread(QThread):
     progress = Signal(int)
@@ -3310,7 +3413,55 @@ class HM64Launcher(QMainWindow):
         )
 
         def finished(path):
+            
+            if path.lower().endswith(".zip"):
 
+                dialog = ZipSelectionDialog(path,self)
+
+                OFFSET_X = 50    
+                OFFSET_Y = 20   
+
+                center_pos = (
+                    self.frameGeometry().center()
+                    - dialog.rect().center()
+                )
+
+                dialog.move(
+                    center_pos.x() + OFFSET_X,
+                    center_pos.y() + OFFSET_Y
+                )
+
+                if dialog.exec() != QDialog.Accepted:
+
+                    os.remove(path)
+
+                    progress.hide()
+
+                    btn.setEnabled(True)
+
+                    btn.setText("⭳")
+
+                    return
+
+                archivos = dialog.selected_files()
+
+                with zipfile.ZipFile(path, "r") as z:
+
+                    for nombre in archivos:
+
+                        if nombre.endswith("/"):
+                            continue
+
+                        destino = os.path.join(
+                            mods_path,
+                            os.path.basename(nombre)
+                        )
+
+                        with z.open(nombre) as origen, open(destino, "wb") as salida:
+                            shutil.copyfileobj(origen, salida)
+
+                os.remove(path)
+            
             status.setText("Instalado")
 
             progress.hide()
