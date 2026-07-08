@@ -1118,6 +1118,11 @@ class HM64Launcher(QMainWindow):
         self.releases_cache = {}
         self.active_installations = {}
         self.load_config()
+
+        self.game_process = None
+        self.process_timer = QTimer(self)
+        self.process_timer.timeout.connect(self.check_game_process)
+        self.process_timer.start(1000)
                 
         self._build_ui()
         self.loader = ReleasesLoader()
@@ -1978,6 +1983,12 @@ class HM64Launcher(QMainWindow):
             
     def launch_active_game(self):
 
+         if self.game_process and self.game_process.poll() is None:
+             self.game_process.terminate()
+             self.game_process = None
+             self.play_btn.setText("▶")
+             return
+            
          juego = JUEGOS[self.juego_activo]
 
          active = self.active_installations.get(juego)
@@ -2036,10 +2047,12 @@ class HM64Launcher(QMainWindow):
 
          try:
 
-             subprocess.Popen(
+             self.game_process = subprocess.Popen(
                  exe_path,
                  cwd=os.path.dirname(exe_path)
              )
+
+             self.play_btn.setText("■")
 
          except Exception as e:
 
@@ -2048,7 +2061,18 @@ class HM64Launcher(QMainWindow):
                  "Error",
                  f"No se pudo ejecutar:\n\n{e}"
              )
-             
+
+
+    def check_game_process(self):
+
+        if self.game_process is None:
+            return
+
+        if self.game_process.poll() is not None:
+            self.game_process = None
+            self.play_btn.setText("▶")
+
+            
     # -------------------------
     # Logic releases
     # -------------------------
