@@ -1,5 +1,6 @@
 import sys
 import os
+import re
 import requests
 import threading
 import time
@@ -3146,6 +3147,32 @@ class HM64Launcher(QMainWindow):
     #------------------------------
     # Gamebanana page details logic
     #------------------------------
+
+    def fix_description_colors(self, html):
+        
+        html = re.sub(
+            r'color\s*:\s*[^;"\']+',
+            'color:#FFD54F',
+            html,
+            flags=re.IGNORECASE
+        )
+        
+        html = re.sub(
+            r'(<font[^>]*?)\s+color\s*=\s*["\'][^"\']*["\']',
+            r'\1 color="#FFD54F"',
+            html,
+            flags=re.IGNORECASE
+        )
+
+        html = re.sub(
+            r'<a\b',
+            '<a style="color:#FFD54F; text-decoration:none;"',
+            html,
+            flags=re.IGNORECASE
+        )
+
+        return html
+    
     def abrir_detalles_mod(self, mod_id, mod_type):
 
          data = self.gamebanana_page.obtener_detalles_mod(
@@ -3161,8 +3188,9 @@ class HM64Launcher(QMainWindow):
          # -------------------------
          # DESCRIPCIÓN
          # -------------------------
+         description = self.fix_description_colors(description)
 
-         self.mod_desc.setText(description)
+         self.mod_desc.setHtml(description)
 
          # -------------------------
          # ARCHIVOS
