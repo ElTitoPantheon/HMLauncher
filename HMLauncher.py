@@ -996,6 +996,10 @@ class GameBananaWidget(QWidget):
             QPushButton:pressed {
                 background:#b53030;
             }
+            QPushButton:focus {
+                    outline:none;
+                    border:none;
+            }
         """)
 
         body_layout.addWidget(btn)
@@ -1297,7 +1301,8 @@ class HM64Launcher(QMainWindow):
 
         layout.addStretch()
 
-        btn_config = QPushButton("⚙")
+        self.btn_config = QPushButton("⚙")
+        btn_config = self.btn_config
         btn_config.setFixedSize(60, 60)
         btn_config.setStyleSheet("""
             QPushButton {
@@ -1306,7 +1311,8 @@ class HM64Launcher(QMainWindow):
                 border-radius:12px;
                 font-size:20px;
             }
-            QPushButton:hover {
+            QPushButton:hover,
+            QPushButton[active="true"] {
                 background:#444;
             }
             QPushButton:focus {
@@ -1725,9 +1731,12 @@ class HM64Launcher(QMainWindow):
                   font-size:15px;
                   font-weight:bold;
               }
-
               QPushButton:hover {
                   background:#C83C3C;
+              }
+              QPushButton:focus {
+                    outline:none;
+                    border:none;
               }
           """)
 
@@ -1819,7 +1828,16 @@ class HM64Launcher(QMainWindow):
     # Config
     # ------------------------- 
     def open_config(self):
-        self.stack.setCurrentIndex(5)  
+        self.stack.setCurrentIndex(5)
+        
+        for btn in self.tab_buttons:
+            btn.setProperty("active", False)
+            btn.style().unpolish(btn)
+            btn.style().polish(btn)
+
+        self.btn_config.setProperty("active", True)
+        self.btn_config.style().unpolish(self.btn_config)
+        self.btn_config.style().polish(self.btn_config)
 
     def page_config(self):
 
@@ -1872,7 +1890,7 @@ class HM64Launcher(QMainWindow):
           save_btn.setFixedWidth(120)
           save_btn.setStyleSheet("""
               QPushButton {
-                  background:#5a5a5a;
+                  background:#3a3a3a;
                   color:black;
                   border:none;
                   border-radius:8px;
@@ -1881,7 +1899,11 @@ class HM64Launcher(QMainWindow):
               }
 
               QPushButton:hover {
-                  background:#707070;
+                  background:#444;
+              }
+              QPushButton:focus {
+                    outline:none;
+                    border:none;
               }
           """)
 
@@ -1988,6 +2010,24 @@ class HM64Launcher(QMainWindow):
              self.game_process.terminate()
              self.game_process = None
              self.play_btn.setText("▶")
+             self.play_btn.setStyleSheet("""
+                 QPushButton {
+                     background:#c83c3c;
+                     color:black;
+                     padding:10px;
+                     border-radius:10px;
+                     font-size:45px;
+                     font-weight:800;
+                 }
+
+                 QPushButton:hover {
+                     background:#ff6666;
+                 }
+                 QPushButton:focus {
+                        outline:none;
+                        border:none;
+                 }
+             """)
              return
             
          juego = JUEGOS[self.juego_activo]
@@ -2054,6 +2094,26 @@ class HM64Launcher(QMainWindow):
              )
 
              self.play_btn.setText("■")
+             self.play_btn.setStyleSheet("""
+                 QPushButton {
+                     background:#c83c3c;
+                     color:black;
+                     padding:10px;
+                     border-radius:10px;
+                     font-size:25px;
+                     font-weight:750;
+                 }
+
+                 QPushButton:hover {
+                     background:#ff6666;
+                 }
+                 QPushButton:focus {
+                        outline:none;
+                        border:none;
+                 }
+             """)
+
+             
 
          except Exception as e:
 
@@ -2072,6 +2132,24 @@ class HM64Launcher(QMainWindow):
         if self.game_process.poll() is not None:
             self.game_process = None
             self.play_btn.setText("▶")
+            self.play_btn.setStyleSheet("""
+                 QPushButton {
+                     background:#c83c3c;
+                     color:black;
+                     padding:10px;
+                     border-radius:10px;
+                     font-size:45px;
+                     font-weight:800;
+                 }
+
+                 QPushButton:hover {
+                     background:#ff6666;
+                 }
+                 QPushButton:focus {
+                        outline:none;
+                        border:none;
+                 }
+             """)
 
             
     # -------------------------
@@ -2279,6 +2357,10 @@ class HM64Launcher(QMainWindow):
                  QPushButton:hover {
                      background:#e04b4b;
                  }
+                 QPushButton:focus {
+                    outline:none;
+                    border:none;
+                 }
              """)
 
              btn.clicked.connect(
@@ -2313,6 +2395,10 @@ class HM64Launcher(QMainWindow):
 
                  QPushButton:hover {
                      background:#444;
+                 }
+                 QPushButton:focus {
+                    outline:none;
+                    border:none;
                  }
              """)
 
@@ -2371,6 +2457,10 @@ class HM64Launcher(QMainWindow):
 
                  QPushButton:hover {
                      background:#c83c3c;
+                 }
+                 QPushButton:focus {
+                    outline:none;
+                    border:none;
                  }
              """)
 
@@ -2532,6 +2622,10 @@ class HM64Launcher(QMainWindow):
                  QPushButton:hover {
                      background:#19e06c;
                  }
+                 QPushButton:focus {
+                    outline:none;
+                    border:none;
+                 }
              """)
 
              progress.hide()
@@ -2590,6 +2684,10 @@ class HM64Launcher(QMainWindow):
 
              QPushButton:hover {
                  background:#c83c3c;
+             }
+             QPushButton:focus {
+                    outline:none;
+                    border:none;
              }
          """)
 
@@ -2720,9 +2818,9 @@ class HM64Launcher(QMainWindow):
              self.save_config()
 
              return
-
+         
          if latest_date != old_date:
-
+             
              release_name = (
                  latest.get("name")
                  or latest.get("tag_name")
@@ -2908,6 +3006,10 @@ class HM64Launcher(QMainWindow):
                   QPushButton:hover {
                       background:#19e06c;
                   }
+                  QPushButton:focus {
+                    outline:none;
+                    border:none;
+                  }
               """)
 
           else:
@@ -2925,6 +3027,10 @@ class HM64Launcher(QMainWindow):
 
                   QPushButton:hover {
                       background:#707070;
+                  }
+                  QPushButton:focus {
+                    outline:none;
+                    border:none;
                   }
               """)
 
@@ -2949,6 +3055,10 @@ class HM64Launcher(QMainWindow):
 
               QPushButton:hover {
                   background:#c83c3c;
+              }
+              QPushButton:focus {
+                    outline:none;
+                    border:none;
               }
           """)
 
@@ -3127,6 +3237,10 @@ class HM64Launcher(QMainWindow):
 
             QPushButton:hover {
                 background:#c83c3c;
+            }
+            QPushButton:focus {
+                    outline:none;
+                    border:none;
             }
         """)
 
@@ -3457,6 +3571,10 @@ class HM64Launcher(QMainWindow):
             QPushButton:hover {
                 background:#e04b4b;
             }
+            QPushButton:focus {
+                    outline:none;
+                    border:none;
+            }
         """)
 
         layout.addWidget(btn)
@@ -3617,6 +3735,10 @@ class HM64Launcher(QMainWindow):
                 QPushButton:hover {
                     background:#00c853;
                 }
+                QPushButton:focus {
+                    outline:none;
+                    border:none;
+                }
             """)
 
             if thread in self.mod_downloads:
@@ -3648,6 +3770,10 @@ class HM64Launcher(QMainWindow):
 
                     QPushButton:hover {
                         background:#e04b4b;
+                    }
+                    QPushButton:focus {
+                        outline:none;
+                        border:none;
                     }
                 """)
 
@@ -3783,6 +3909,11 @@ class HM64Launcher(QMainWindow):
 
          
     def set_game(self, i):
+
+        self.btn_config.setProperty("active", False)
+        self.btn_config.style().unpolish(self.btn_config)
+        self.btn_config.style().polish(self.btn_config)
+
         self.juego_activo = i
         juego = JUEGOS[i]
         self.set_tab(0)
@@ -3802,6 +3933,10 @@ class HM64Launcher(QMainWindow):
         self.gamebanana_page.all_mods = []
 
     def set_tab(self, i):
+
+        self.btn_config.setProperty("active", False)
+        self.btn_config.style().unpolish(self.btn_config)
+        self.btn_config.style().polish(self.btn_config)
 
         self.tab_activa = i 
         self.stack.setCurrentIndex(i)
