@@ -19,9 +19,13 @@ from PySide6.QtWidgets import (
     QWidget, QListWidget, QTreeWidgetItem, QListWidgetItem,
     QTreeWidget, QStackedWidget,
     QFrame, QProgressBar,QLineEdit, QScrollArea, QGridLayout,
-    QDialog, QTextEdit, QFileDialog, QMessageBox, QSpinBox, QDialogButtonBox
+    QDialog, QTextEdit, QFileDialog, QMessageBox, QSpinBox, QDialogButtonBox,
+    QGraphicsOpacityEffect, QSizePolicy
 )
-from PySide6.QtCore import Qt, QThread, Signal, QTimer, QObject
+from PySide6.QtCore import (
+    Qt, QThread, Signal, QTimer, QObject,
+    QPropertyAnimation
+)    
 from PySide6.QtGui import QMouseEvent, QPixmap, QImage, QColor
  
 
@@ -1387,92 +1391,123 @@ class HM64Launcher(QMainWindow):
     # GENERAL
     # -------------------------
     def page_general(self):
-         w = QWidget()
 
-         self.general_page = w
+        w = QWidget()
+        self.general_page = w
 
-         self.bg_label = QLabel(w)
-         self.bg_label.setScaledContents(False)
-         self.bg_label.lower()
+        # -------------------------
+        # Background
+        # -------------------------
 
-         self.bg_pixmap = QPixmap()
+        self.bg_label = QLabel(w)
+        self.bg_label.setScaledContents(False)
+        self.bg_label.lower()
 
-         self.bg_label.setMinimumSize(0, 0)
-         self.bg_label.setMaximumSize(9999, 9999)
+        self.bg_pixmap = QPixmap()
 
-         self.dark_overlay = QFrame(w)
-         self.dark_overlay.setStyleSheet(
-             "background-color: rgba(0, 0, 0, 120);"
-         )
-         self.dark_overlay.lower()
+        self.bg_label.setMinimumSize(0, 0)
+        self.bg_label.setMaximumSize(9999, 9999)
 
-         layout = QVBoxLayout(w)
+        self.bg_effect = QGraphicsOpacityEffect(self.bg_label)
+        self.bg_label.setGraphicsEffect(self.bg_effect)
 
-         layout.setContentsMargins(18, 12, 18, 18)
-         
-         self.label = QLabel(
-             f"Instalación activa: {JUEGOS[self.juego_activo]}"
-         )
+        self.dark_overlay = QFrame(w)
+        self.dark_overlay.setStyleSheet(
+            "background-color: rgba(0,0,0,120);"
+        )
+        self.dark_overlay.lower()
 
-         self.label.setStyleSheet("""
-             background:transparent;
-             color:white;
-             font-size:14px;
-             font-weight:bold;
-         """)
+        # -------------------------
+        # Layout principal
+        # -------------------------
 
-         layout.addWidget(
-             self.label,
-             alignment=Qt.AlignmentFlag.AlignTop |
-                       Qt.AlignmentFlag.AlignLeft
-         )
-         
-         layout.addStretch()
+        layout = QVBoxLayout(w)
+        layout.setContentsMargins(18, 18, 18, 18)
 
-         
-         self.play_btn = QPushButton("▶")
-         btn = self.play_btn
+        # -------------------------
+        # Instalación activa
+        # -------------------------
 
-         btn.setFixedSize(120, 42)
-         
-         btn.clicked.connect(self.launch_active_game)
+        self.label = QLabel()
 
-         btn.setStyleSheet("""
-             QPushButton {
-                 background:#c83c3c;
-                 color:black;
-                 padding:10px;
-                 border-radius:10px;
-                 font-size:45px;
-                 font-weight:800;
-             }
+        self.label.setStyleSheet("""
+            QLabel{
+                background: rgba(0,0,0,125);
+                color: white;
+                border: 1px solid rgba(255,255,255,20);
+                border-radius: 8px;
+                padding: 6px 12px;
+                font-size: 13px;
+                font-weight: 600;
+            }
+        """)
 
-             QPushButton:hover {
-                 background:#ff6666;
-             }
-             QPushButton:focus {
-                    outline:none;
-                    border:none;
-             }
-         """)
+        self.label.setSizePolicy(
+            QSizePolicy.Policy.Maximum,
+            QSizePolicy.Policy.Fixed
+        )
 
-         bottom = QHBoxLayout()
+        layout.addWidget(
+            self.label,
+            alignment=Qt.AlignTop | Qt.AlignLeft
+        )
 
-         bottom.setContentsMargins(0, 0, 25, 20)
+        layout.addStretch()
 
-         bottom.addStretch()
+        # -------------------------
+        # Botón Play
+        # -------------------------
 
-         bottom.addWidget(
-             btn,
-             alignment=Qt.AlignmentFlag.AlignRight |
-                       Qt.AlignmentFlag.AlignBottom
-         )
+        self.play_btn = QPushButton("▶")
 
-         layout.addLayout(bottom)
+        self.play_btn.setFixedSize(120, 42)
 
-         self.update_background()
+        self.play_btn.clicked.connect(
+            self.launch_active_game
+        )
 
-         return w
+        self.play_btn.setStyleSheet("""
+            QPushButton{
+                background:#c83c3c;
+                color:black;
+                padding:10px;
+                border-radius:10px;
+                font-size:45px;
+                font-weight:800;
+            }
+
+            QPushButton:hover{
+                background:#ff6666;
+            }
+
+            QPushButton:focus{
+                outline:none;
+                border:none;
+            }
+        """)
+
+        bottom = QHBoxLayout()
+
+        bottom.setContentsMargins(
+            0,
+            0,
+            25,
+            20
+        )
+
+        bottom.addStretch()
+
+        bottom.addWidget(
+            self.play_btn,
+            alignment=Qt.AlignRight | Qt.AlignBottom
+        )
+
+        layout.addLayout(bottom)
+
+        self.update_background()
+        self.update_general_label()
+
+        return w
 
     # -------------------------
     # VERSIONES
@@ -1920,6 +1955,20 @@ class HM64Launcher(QMainWindow):
     # -------------------------
     # Logic general
     # -------------------------
+
+
+
+    def fade_background(self):
+
+        self.anim = QPropertyAnimation(
+            self.bg_effect,
+            b"opacity"
+        )
+
+        self.anim.setDuration(250)
+        self.anim.setStartValue(0.0)
+        self.anim.setEndValue(1.0)
+        self.anim.start()
     
     def update_general_label(self):
 
@@ -3921,9 +3970,12 @@ class HM64Launcher(QMainWindow):
 
         self.update_general_label()
         self.update_background()
+        self.fade_background()
         self.load_versions()
         self.load_mods()
         self.update_active_buttons()
+
+        
 
         self.gamebanana_page.clear_cards()
         self.gamebanana_page.mods = []
