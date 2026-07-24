@@ -1,0 +1,49 @@
+{
+    "es": {
+        "tabs": {
+            "general": "General",
+            "versions": "Versiones",
+            "mods": "Mods",
+            "gamebanana": "GameBanana"
+        },
+        "general": {
+          
+        },
+        "versions": {
+          
+        },
+        "mods": {
+          
+        },
+        "gamebanana": {
+          
+        },
+        "config": {
+          
+        }
+    },
+
+    "en": {
+        "tabs": {
+            "general": "General",
+            "versions": "Versions",
+            "mods": "Mods",
+            "gamebanana": "GameBanana"
+        },
+        "general": {
+          
+        },
+        "versions": {
+          
+        },
+        "mods": {
+          
+        },
+        "gamebanana": {
+          
+        },
+        "config": {
+          
+        }
+    }
+}
