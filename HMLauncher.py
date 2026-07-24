@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (
     QTreeWidget, QStackedWidget,
     QFrame, QProgressBar,QLineEdit, QScrollArea, QGridLayout,
     QDialog, QTextEdit, QFileDialog, QMessageBox, QSpinBox, QDialogButtonBox,
-    QGraphicsOpacityEffect, QSizePolicy
+    QGraphicsOpacityEffect, QSizePolicy, QComboBox
 )
 from PySide6.QtCore import (
     Qt, QThread, Signal, QTimer, QObject,
@@ -34,8 +34,11 @@ CARD_W = 185
 CARD_H = 280
 IMG_H = 120
 GRID_COLS = 3
+TABS = ["General", "Versiones", "Mods", "GameBanana"]
 CONFIG_FILE = "launcher_config.json"
-GAMES_FILE = "games.json"
+GAMES_FILE = "launcher_games.json"
+LANG_FILE = "launcher_language.json"
+
 def load_games():
 
     try:
@@ -68,8 +71,6 @@ def load_games():
 COLOR_BG = "#191919"
 COLOR_PANEL = "#0a0a0a"
 JUEGOS, REPOS, GAMEBANANA_IDS = load_games()
-TABS = ["General", "Versiones", "Mods", "GameBanana"]
-
 BASE_URL = "https://gamebanana.com/apiv11/Game/{}/Subfeed"
 
 
@@ -1127,6 +1128,7 @@ class HM64Launcher(QMainWindow):
         self.releases_cache = {}
         self.active_installations = {}
         self.load_config()
+        self.load_language()
 
         self.game_process = None
         self.process_timer = QTimer(self)
@@ -1346,7 +1348,15 @@ class HM64Launcher(QMainWindow):
         tabs_bar.setContentsMargins(0, 0, 0, 0)
 
         self.tab_buttons = []
-        for i, t in enumerate(TABS):
+
+        tabs = [
+            self.lang["tabs"]["general"],
+            self.lang["tabs"]["versions"],
+            self.lang["tabs"]["mods"],
+            self.lang["tabs"]["gamebanana"]
+        ]
+
+        for i, t in enumerate(tabs):
             btn = QPushButton(t)
             self.tab_buttons.append(btn)
             btn.setStyleSheet("""
@@ -1921,8 +1931,46 @@ class HM64Launcher(QMainWindow):
 
           layout.addWidget(self.interval_spin)
 
+          language_label = QLabel("Idioma")
+          language_label.setStyleSheet("""
+              color:white;
+              font-size:13px;
+              font-weight:bold;
+          """)
+          layout.addWidget(language_label)
+
+          self.language_combo = QComboBox()
+
+          self.language_combo.addItem("Español", "es")
+          self.language_combo.addItem("English", "en")
+
+          index = self.language_combo.findData(self.language)
+          if index >= 0:
+              self.language_combo.setCurrentIndex(index)
+          self.language_combo.setFixedWidth(80)
+          self.language_combo.setStyleSheet("""
+              QComboBox {
+                  background:#1e1e1e;
+                  color:white;
+                  border:none;
+                  padding:6px;
+              }
+
+              QComboBox::drop-down {
+                  border:none;
+              }
+
+              QComboBox QAbstractItemView {
+                  background:#1e1e1e;
+                  color:white;
+                  selection-background-color:#444;
+              }
+          """)
+
+          layout.addWidget(self.language_combo)
+          
           save_btn = QPushButton("💾")
-          save_btn.setFixedWidth(120)
+          save_btn.setFixedWidth(80)
           save_btn.setStyleSheet("""
               QPushButton {
                   background:#3a3a3a;
@@ -1947,7 +1995,7 @@ class HM64Launcher(QMainWindow):
           )
 
           layout.addWidget(save_btn)
-
+          
           layout.addStretch()
 
           return w 
@@ -2969,6 +3017,10 @@ class HM64Launcher(QMainWindow):
               "update_check_interval"
           ] = self.interval_spin.value()
 
+          self.config_data["language"] = self.language_combo.currentData()
+          self.language = self.language_combo.currentData()
+          self.load_language()
+          
           self.save_config()
 
           self.start_update_timer()
@@ -3849,7 +3901,8 @@ class HM64Launcher(QMainWindow):
                  juego: None for juego in JUEGOS
              },
              "release_dates": {},
-             "update_check_interval": 60
+             "update_check_interval": 60,
+             "language": "es"
          }
 
          if not os.path.exists(CONFIG_FILE):
@@ -3878,6 +3931,9 @@ class HM64Launcher(QMainWindow):
              if "update_check_interval" not in self.config_data:
                  self.config_data["update_check_interval"] = 60
 
+             if "language" not in self.config_data:
+                 self.config_data["language"] = "es"    
+
              
              for juego in JUEGOS:
 
@@ -3888,7 +3944,9 @@ class HM64Launcher(QMainWindow):
              self.active_installations = (
                  self.config_data["active_installations"]
              )
-
+             
+             self.language = self.config_data["language"]
+             
              self.save_config()
 
          except Exception as e:
@@ -3921,6 +3979,20 @@ class HM64Launcher(QMainWindow):
          except Exception as e:
 
              print("Error guardando config:", e)
+
+
+
+    def load_language(self):
+        try:
+            with open(LANG_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            # Si el idioma no existe, usa español
+            self.lang = data.get(self.language, data.get("es", {}))
+
+        except Exception as e:
+            print("Error cargando language.json:", e)
+            self.lang = {}         
 
     #---------------------
     #
