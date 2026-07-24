@@ -7,19 +7,42 @@
             "gamebanana": "GameBanana"
         },
         "general": {
-          
+            "activenstall": "Instalación activa: ",
+            "noinstall": "Instalación activa: Ninguna",
+            "wtitle1": "Sin instalación",
+            "wtitle2": "Ruta inválida",
+            "wtitle3": "EXE no encontrado",
+            "warning1": "No hay una instalación activa para este juego",
+            "warning2": "La instalación activa no existe",
+            "warning3": "No se encontró ningún ejecutable"
         },
         "versions": {
-          
+            "state1": "No instalado",
+            "state2": "Instalado",
+            "state3": "Instalación activa",
+            "warning": "¿Seguro que quieres borrar la instalación?"
         },
         "mods": {
-          
+            "active": "Activo",
+            "notactive": "Desactivado",
+            "state1": "No hay instalación activa",
+            "state2": "La instalación no tiene carpeta mods",
+            "state3": "No hay mods instalados",
+            "warning": "¿Seguro que quieres borrar este mod?"
         },
         "gamebanana": {
-          
+            "state1": "No instalado",
+            "state2": "Descargando...",
+            "state3": "Instalado",
+            "wtitle1": "Sin instalación",
+            "wtitle2": "Ruta invalida",
+            "warning1": "No hay una instalación activa para este juego",
+            "warning2": "La instalación activa no tiene una ruta válida", 
+            "fileselect": "Selecciona los archivos que deseas instalar"  
         },
         "config": {
-          
+            "checking": "Comprobar nuevas versiones cada (minutos)",
+            "language": "Idioma (necesita reinicio)"
         }
     },
 
@@ -31,19 +54,42 @@
             "gamebanana": "GameBanana"
         },
         "general": {
-          
+            "activenstall": "Active installation: ",
+            "noinstall": "Active installation: None",
+            "wtitle1": "Any installation",
+            "wtitle2": "Invalid route",
+            "wtitle3": "EXE no encontrado",
+            "warning1": "There is no active installation for this game",
+            "warning2": "The active installation does not exist",
+            "warning3": "No executable was found"
         },
         "versions": {
-          
+            "state1": "Not installed",
+            "state2": "Installed",
+            "state3": "Active installation",
+            "warning": "Are you sure you want to delete the installation?"
         },
         "mods": {
-          
+            "active": "Enabled",
+            "notactive": "Disabled",
+            "state1": "There is no active installation",
+            "state2": "The installation does not have a mods folder",
+            "state3": "No mods installed",
+            "warning": "Are you sure you want to delete this mod?"          
         },
         "gamebanana": {
-          
+            "state1": "Not installed",
+            "state2": "Downloading...",
+            "state3": "Installed",
+            "wtitle1": "Any installation",
+            "wtitle2": "Invalid route",
+            "warning1": "There is no active installation for this game",
+            "warning2": "The active installation does not have a valid path",
+            "fileselect": "Select the files you want to install"  
         },
         "config": {
-          
+            "checking": "Check for new versions every (minutes)",
+            "language": "Language (requires restart)"
         }
     }
 }
