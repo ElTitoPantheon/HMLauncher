@@ -1895,7 +1895,7 @@ class HM64Launcher(QMainWindow):
           )
 
           interval_label = QLabel(
-              "Comprobar nuevas versiones cada (minutos)"
+              self.lang["config"]["checking"]
           )
 
           interval_label.setStyleSheet("""
@@ -1931,7 +1931,7 @@ class HM64Launcher(QMainWindow):
 
           layout.addWidget(self.interval_spin)
 
-          language_label = QLabel("Idioma")
+          language_label = QLabel(self.lang["config"]["language"])
           language_label.setStyleSheet("""
               color:white;
               font-size:13px;
@@ -2004,8 +2004,6 @@ class HM64Launcher(QMainWindow):
     # Logic general
     # -------------------------
 
-
-
     def fade_background(self):
 
         self.anim = QPropertyAnimation(
@@ -2029,13 +2027,13 @@ class HM64Launcher(QMainWindow):
              version = active.get("version", "Desconocida")
 
              self.label.setText(
-                 f"Instalación activa: {version}"
+                 f"{self.lang['general']['activenstall']}{version}"
              )
 
          else:
 
              self.label.setText(
-                 "Instalación activa: ninguna"
+                 self.lang["general"]["noinstall"]
              )
 
     def resizeEvent(self, event):
@@ -2134,8 +2132,8 @@ class HM64Launcher(QMainWindow):
          if not active:
              QMessageBox.warning(
                  self,
-                 "Sin instalación",
-                 "No hay una instalación activa para este juego."
+                 self.lang["general"]["wtitle1"],
+                 self.lang["general"]["warning1"]
              )
              return
 
@@ -2144,8 +2142,8 @@ class HM64Launcher(QMainWindow):
          if not base_path or not os.path.exists(base_path):
              QMessageBox.warning(
                  self,
-                 "Ruta inválida",
-                 "La instalación activa no existe."
+                 self.lang["general"]["wtitle2"],
+                 self.lang["general"]["warning2"]
              )
              return
 
@@ -2176,8 +2174,8 @@ class HM64Launcher(QMainWindow):
 
              QMessageBox.warning(
                  self,
-                 "EXE no encontrado",
-                 "No se encontró ningún ejecutable."
+                 self.lang["general"]["wtitle3"],
+                 self.lang["general"]["warning3"]
              )
              return
 
@@ -2293,11 +2291,11 @@ class HM64Launcher(QMainWindow):
 
 
          if activa:
-              status_text = "Instalación activa"
+              status_text = self.lang["versions"]["state3"]
          elif instalado:
-              status_text = "Instalado"
+              status_text = self.lang["versions"]["state2"]
          else:
-              status_text = "No instalado"
+              status_text = self.lang["versions"]["state1"]
 
          subtitle = QLabel(status_text)
          
@@ -2702,7 +2700,7 @@ class HM64Launcher(QMainWindow):
 
          def finished(msg):
 
-             subtitle.setText("Instalado")
+             subtitle.setText(self.lang["versions"]["state2"])
 
              btn.setText("▶")
 
@@ -2745,7 +2743,7 @@ class HM64Launcher(QMainWindow):
          layout.setContentsMargins(0, 10, 18, 10)  
          msgbox.setWindowFlag(Qt.FramelessWindowHint)
          msgbox.setText(
-             f"¿Seguro que quieres borrar la instalación?\n\n{name}"
+             f"{self.lang['versions']['warning']}\n\n{name}"
          )
 
          msgbox.setStandardButtons(
@@ -3072,7 +3070,7 @@ class HM64Launcher(QMainWindow):
           """)
 
           subtitle = QLabel(
-              "Activo" if activo else "Desactivado"
+              self.lang["mods"]["active"] if activo else self.lang["mods"]["notactive"]
           )
 
           subtitle.setStyleSheet("""
@@ -3243,7 +3241,7 @@ class HM64Launcher(QMainWindow):
 
          if not base_path:
 
-             label = QLabel("No hay instalación activa")
+             label = QLabel(self.lang["mods"]["state1"])
              label.setStyleSheet("color:white;")
 
              self.mods_layout.addWidget(label)
@@ -3258,7 +3256,7 @@ class HM64Launcher(QMainWindow):
 
          if not os.path.exists(mods_path):
 
-             label = QLabel("La instalación no tiene carpeta mods")
+             label = QLabel(self.lang["mods"]["state2"])
              label.setStyleSheet("color:white;")
 
              self.mods_layout.addWidget(label)
@@ -3277,7 +3275,7 @@ class HM64Launcher(QMainWindow):
 
          if not archivos:
 
-             label = QLabel("No hay mods instalados")
+             label = QLabel(self.lang["mods"]["state3"])
              label.setStyleSheet("color:white;")
 
              self.mods_layout.addWidget(label)
@@ -3305,7 +3303,7 @@ class HM64Launcher(QMainWindow):
         msgbox.setWindowFlag(Qt.FramelessWindowHint)
 
         msgbox.setText(
-            f"¿Seguro que quieres borrar este mod?\n\n{mod_name}"
+            f"{self.lang['mods']['warning']}\n\n{mod_name}"
         )
 
         msgbox.setStandardButtons(
@@ -3609,7 +3607,7 @@ class HM64Launcher(QMainWindow):
             font-size:12px;
         """)
 
-        status = QLabel("No instalado")
+        status = QLabel(self.lang["gamebanana"]["state1"])
 
         status.setStyleSheet("""
             color:#9a9a9a;
@@ -3710,8 +3708,8 @@ class HM64Launcher(QMainWindow):
 
             QMessageBox.warning(
                 self,
-                "Sin instalación",
-                "No hay una instalación activa para este juego."
+                self.lang["gamebanana"]["wtitle1"],
+                self.lang["gamebanana"]["warning1"]
             )
 
             return
@@ -3722,8 +3720,8 @@ class HM64Launcher(QMainWindow):
 
             QMessageBox.warning(
                 self,
-                "Ruta inválida",
-                "La instalación activa no tiene una ruta válida."
+                self.lang["gamebanana"]["wtitle2"],
+                self.lang["gamebanana"]["warning2"]
             )
 
             return
@@ -3815,7 +3813,7 @@ class HM64Launcher(QMainWindow):
 
                 os.remove(path)
             
-            status.setText("Instalado")
+            status.setText(self.lang["gamebanana"]["state3"])
 
             progress.hide()
 
